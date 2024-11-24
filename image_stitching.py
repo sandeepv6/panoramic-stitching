@@ -4,15 +4,22 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 import PySimpleGUI as sg
+import argparse
 
 def load_images(image_paths):
-    images = [cv2.imread(path) for path in image_paths]
-    for i, img in enumerate(images):
-        plt.figure()
-        plt.title(f"Image {i+1}")
-        plt.imshow(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
-    plt.show()
+    images = []
+    for path in image_paths:
+        try:
+            img = cv2.imread(path)
+            if img is None:
+                raise FileNotFoundError(f"Image at {path} could not be loaded.")
+            images.append(img)
+        except Exception as e:
+            print(f"Error loading image {path}: {e}")
+    if not images:
+        raise ValueError("No valid images loaded. Please check the paths.")
     return images
+
 
 def detect_and_match_features(img1, img2, use_sift=True):
     if use_sift:
@@ -52,12 +59,18 @@ def compute_homography_and_warp(kp1, kp2, matches, img1, img2):
     
     return warped_img
 
-def blend_images(img1, img2):
-    blended_img = cv2.addWeighted(img1, 0.5, img2, 0.5, 0)
-    plt.imshow(cv2.cvtColor(blended_img, cv2.COLOR_BGR2RGB))
-    plt.title("Blended Image")
-    plt.show()
+def blend_images(img1, img2, H):
+    height, width = img2.shape[:2]
+    warped_img1 = cv2.warpPerspective(img1, H, (width, height))
+    
+    mask = np.zeros_like(warped_img1, dtype=np.uint8)
+    mask[warped_img1 > 0] = 255
+
+    center = (width // 2, height // 2)
+    blended_img = cv2.seamlessClone(warped_img1, img2, mask, center, cv2.NORMAL_CLONE)
+    
     return blended_img
+
 
 def stitch_images(images):
     base_img = images[0]
@@ -72,7 +85,8 @@ def panoramic_gui():
     layout = [
         [sg.Text("Select Images for Panorama")],
         [sg.Input(key="FILES", enable_events=True, visible=False), sg.FilesBrowse("Browse", file_types=(("Image Files", "*.jpg;*.png"),))],
-        [sg.Button("Stitch Images"), sg.Exit()]
+        [sg.Button("Stitch Images"), sg.Exit()],
+        [sg.Text("", size=(40, 1), key="STATUS")]
     ]
 
     window = sg.Window("Panoramic Stitching Tool", layout)
@@ -82,11 +96,22 @@ def panoramic_gui():
         if event in (sg.WINDOW_CLOSED, "Exit"):
             break
         if event == "Stitch Images":
-            image_paths = values["FILES"].split(";")
-            images = load_images(image_paths)
-            stitched_image = stitch_images(images)
-            plt.imshow(cv2.cvtColor(stitched_image, cv2.COLOR_BGR2RGB))
-            plt.title("Panoramic Image")
-            plt.show()
+            window["STATUS"].update("Processing...")
+            try:
+                image_paths = values["FILES"].split(";")
+                images = load_images(image_paths)
+                stitched_image = stitch_images(images)
+                plt.imshow(cv2.cvtColor(stitched_image, cv2.COLOR_BGR2RGB))
+                plt.title("Panoramic Image")
+                plt.show()
+                window["STATUS"].update("Stitching completed!")
+            except Exception as e:
+                window["STATUS"].update(f"Error: {e}")
     
     window.close()
+    
+def save_image(image, output_path="panorama_output.jpg"):
+    cv2.imwrite(output_path, image)
+    print(f"Panorama saved at {output_path}")
+
+
