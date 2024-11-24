@@ -59,18 +59,12 @@ def compute_homography_and_warp(kp1, kp2, matches, img1, img2):
     
     return warped_img
 
-def blend_images(img1, img2, H):
-    height, width = img2.shape[:2]
-    warped_img1 = cv2.warpPerspective(img1, H, (width, height))
-    
-    mask = np.zeros_like(warped_img1, dtype=np.uint8)
-    mask[warped_img1 > 0] = 255
-
-    center = (width // 2, height // 2)
-    blended_img = cv2.seamlessClone(warped_img1, img2, mask, center, cv2.NORMAL_CLONE)
-    
+def blend_images(img1, img2):
+    blended_img = cv2.addWeighted(img1, 0.5, img2, 0.5, 0)
+    plt.imshow(cv2.cvtColor(blended_img, cv2.COLOR_BGR2RGB))
+    plt.title("Blended Image")
+    plt.show()
     return blended_img
-
 
 def stitch_images(images):
     base_img = images[0]

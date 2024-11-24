@@ -1,5 +1,4 @@
-from image_stitching import panoramic_gui
-from panorama_tool import panoramic_gui, load_images, stitch_images, save_image
+from image_stitching import panoramic_gui, load_images, stitch_images, save_image
 import argparse
 
 def run_cli():
