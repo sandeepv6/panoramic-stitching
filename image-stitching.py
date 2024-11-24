@@ -52,6 +52,13 @@ def compute_homography_and_warp(kp1, kp2, matches, img1, img2):
     
     return warped_img
 
+def blend_images(img1, img2):
+    blended_img = cv2.addWeighted(img1, 0.5, img2, 0.5, 0)
+    plt.imshow(cv2.cvtColor(blended_img, cv2.COLOR_BGR2RGB))
+    plt.title("Blended Image")
+    plt.show()
+    return blended_img
+
 
 
 def panoramic_gui():
