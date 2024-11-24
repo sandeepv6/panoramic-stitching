@@ -59,6 +59,13 @@ def blend_images(img1, img2):
     plt.show()
     return blended_img
 
+def stitch_images(images):
+    base_img = images[0]
+    for i in range(1, len(images)):
+        kp1, kp2, matches = detect_and_match_features(base_img, images[i])
+        warped_img = compute_homography_and_warp(kp1, kp2, matches, base_img, images[i])
+        base_img = blend_images(warped_img, images[i])
+    return base_img
 
 
 def panoramic_gui():
