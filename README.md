@@ -8,7 +8,6 @@ The Panoramic Image Stitching Tool is a Python-based application that combines o
 
 - **Feature Detection Options**: Choose between SIFT and ORB for feature detection.
 - **Matching Algorithms**: Supports BF Matcher and FLANN Matcher for feature correspondence.
-- **Manual Feature Selection**: Manually select points for stitching to handle complex cases.
 - **User-Friendly Interface**: PySimpleGUI-based GUI for easy image input, algorithm selection, and image saving.
 - **Image Blending**: Smooth transitions between stitched images for a visually appealing panorama.
 
