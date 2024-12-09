@@ -3,9 +3,18 @@ import argparse
 
 def run_cli():
     """Command-line interface for the panoramic stitching tool."""
+    # Ask the user to input the file paths
+    image_input = input("Please enter the paths to the images separated by spaces: ")
+
+    # Initialize argparse with the user-provided input
     parser = argparse.ArgumentParser(description="Panoramic Image Stitching Tool")
     parser.add_argument("images", nargs="+", help="Paths to input images for stitching")
     parser.add_argument("--output", default="panorama_output.jpg", help="Path to save the stitched panorama")
+
+    # Simulate the command line input using sys.argv
+    import sys
+    sys.argv = [''] + image_input.split() + sys.argv[1:]  # Adjust the system arguments to include the user input
+
     args = parser.parse_args()
 
     try:
