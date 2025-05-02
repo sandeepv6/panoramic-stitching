@@ -26,3 +26,4 @@ The Panoramic Image Stitching Tool is a Python-based application that combines o
 - Required libraries:
   ```bash
   pip install opencv-python-headless numpy matplotlib PySimpleGUI
+  ```
